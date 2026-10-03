@@ -1,0 +1,16 @@
+services:
+  mediashelf:
+    build: .
+    ports:
+      - "47213:47213"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - mediashelf-data:/data
+    restart: unless-stopped
+
+volumes:
+  mediashelf-data:
