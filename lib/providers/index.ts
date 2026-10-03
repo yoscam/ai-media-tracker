@@ -1,13 +1,13 @@
 import type { Candidate, MediaType } from "../types";
+import { discoverCinemeta, searchCinemeta } from "./cinemeta";
 import { discoverAniList, searchAniList } from "./anilist";
 import { discoverOpenLibrary, searchOpenLibrary } from "./openlibrary";
 import { discoverTmdb, searchTmdb, tmdbConfigured } from "./tmdb";
 
 export function searchableTypes(): Record<MediaType, boolean> {
-  const tmdb = tmdbConfigured();
   return {
-    movie: tmdb,
-    tv: tmdb,
+    movie: true,
+    tv: true,
     anime: true,
     manga: true,
     book: true,
@@ -24,7 +24,7 @@ export async function searchMedia(type: MediaType, q: string): Promise<Candidate
       return searchOpenLibrary(q);
     case "movie":
     case "tv":
-      return tmdbConfigured() ? searchTmdb(type, q) : [];
+      return tmdbConfigured() ? searchTmdb(type, q) : searchCinemeta(type, q);
     default:
       return [];
   }
@@ -43,7 +43,7 @@ export async function discoverMedia(
       return discoverOpenLibrary(genres, page);
     case "movie":
     case "tv":
-      return tmdbConfigured() ? discoverTmdb(type, genres, page) : [];
+      return tmdbConfigured() ? discoverTmdb(type, genres, page) : discoverCinemeta(type, genres, page);
     default:
       return [];
   }

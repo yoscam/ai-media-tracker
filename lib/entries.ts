@@ -64,7 +64,7 @@ export const entryInputSchema = z.object({
   overview: z.string().max(5000).nullish(),
   genres: z.array(z.string()).max(30).default([]),
   source: z
-    .enum(["anilist", "tmdb", "openlibrary", "manual", "ai"])
+    .enum(["anilist", "tmdb", "cinemeta", "openlibrary", "manual", "ai"])
     .default("manual"),
   externalId: z.string().max(100).nullish(),
   status: z.enum(STATUSES).default("planning"),

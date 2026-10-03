@@ -256,9 +256,7 @@ export function AddMediaDialog({
               notice={
                 canSearch
                   ? null
-                  : type === "game"
-                    ? "There is no game metadata provider yet, so games are added by hand."
-                    : "Add a TMDB_API_KEY to search movies and shows. Until then, add them by hand."
+                  : "There is no game metadata provider yet, so games are added by hand."
               }
               onSubmit={async (payload) => {
                 const ok = await save(payload, `manual:${payload.title}`);

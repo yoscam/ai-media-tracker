@@ -1,4 +1,3 @@
-import { normalizeGenres } from "../genres";
 import type { Candidate } from "../types";
 import { getJson } from "./http";
 
@@ -16,6 +15,28 @@ interface OLDoc {
 const FIELDS =
   "key,title,author_name,first_publish_year,cover_i,subject,number_of_pages_median,ratings_average";
 
+const KEYWORDS: [string, string][] = [
+  ["science fiction", "sci-fi"], ["science-fiction", "sci-fi"], ["sci-fi", "sci-fi"],
+  ["fantasy", "fantasy"], ["mystery", "mystery"], ["detective", "mystery"],
+  ["thriller", "thriller"], ["suspense", "thriller"], ["horror", "horror"],
+  ["romance", "romance"], ["historical", "history"], ["history", "history"],
+  ["adventure", "adventure"], ["dystopia", "dystopian"], ["crime", "crime"],
+  ["humor", "comedy"], ["comedy", "comedy"], ["biograph", "biography"],
+  ["philosoph", "philosophy"], ["psycholog", "psychological"], ["war", "war"],
+  ["drama", "drama"], ["classic", "classics"], ["cyberpunk", "cyberpunk"],
+  ["space opera", "space opera"], ["young adult", "young adult"],
+];
+
+// Open Library subjects are free-form tags; keep only ones that describe a genre.
+function bookGenres(subjects: string[]): string[] {
+  const text = subjects.map((s) => s.toLowerCase());
+  const out: string[] = [];
+  for (const [needle, genre] of KEYWORDS) {
+    if (!out.includes(genre) && text.some((t) => new RegExp(`\\b${needle}`).test(t))) out.push(genre);
+  }
+  return out.slice(0, 6);
+}
+
 function toCandidate(d: OLDoc): Candidate {
   return {
     type: "book",
@@ -28,7 +49,7 @@ function toCandidate(d: OLDoc): Candidate {
       ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg`
       : null,
     overview: null,
-    genres: normalizeGenres(d.subject ?? [], 6),
+    genres: bookGenres(d.subject ?? []),
     total: d.number_of_pages_median ?? null,
     quality: d.ratings_average ? d.ratings_average / 5 : undefined,
   };

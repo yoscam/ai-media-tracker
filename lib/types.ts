@@ -37,7 +37,7 @@ export function statusLabel(type: MediaType, status: Status): string {
   return "Watching";
 }
 
-export type Source = "anilist" | "tmdb" | "openlibrary" | "manual" | "ai";
+export type Source = "anilist" | "tmdb" | "cinemeta" | "openlibrary" | "manual" | "ai";
 
 export interface Entry {
   id: number;

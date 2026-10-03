@@ -1,8 +1,10 @@
 "use client";
 
-import { Sparkles, Library, Download } from "lucide-react";
+import { Sparkles, Library, Download, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { AddMediaDialog } from "@/components/add-media-dialog";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +44,7 @@ export function SiteHeader({ searchable }: { searchable: Record<string, boolean>
           })}
         </nav>
         <div className="ml-auto flex items-center gap-2">
+          <SyncButton />
           <a
             href="/api/export"
             className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground md:flex"
@@ -54,5 +57,37 @@ export function SiteHeader({ searchable }: { searchable: Record<string, boolean>
         </div>
       </div>
     </header>
+  );
+}
+
+function SyncButton() {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          const res = await fetch("/api/sync", { method: "POST" });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error ?? "Sync failed");
+          const parts = [`${json.updated} of ${json.checked} titles updated`];
+          if (json.unmatched.length) parts.push(`no match: ${json.unmatched.join(", ")}`);
+          if (json.skipped) parts.push(`${json.skipped} skipped (provider unreachable)`);
+          toast.success(json.checked ? parts.join(" · ") : "Everything is already synced");
+          router.refresh();
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Sync failed");
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="hidden items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60 md:flex"
+      title="Fill in posters, genres and descriptions for hand-added titles"
+    >
+      <RefreshCw className={cn("size-4", busy && "animate-spin")} aria-hidden />
+      {busy ? "Syncing…" : "Sync"}
+    </button>
   );
 }
