@@ -3,9 +3,9 @@
 A self-hosted tracker for movies, TV shows, anime, manga, books and games, with
 recommendations that learn from your ratings.
 
-Everything lives in a single SQLite file you own. There is no account system and no
-telemetry. Run it on your home server or laptop, and put it behind a reverse proxy with
-auth if you expose it beyond your LAN.
+Everything lives in a single SQLite file you own. There are no accounts and no telemetry.
+It has a single optional password (`APP_PASSWORD`); set it, or put the app behind a
+reverse proxy with auth, if you expose it beyond your LAN.
 
 ## Features
 
@@ -60,6 +60,7 @@ The database is stored in the `mediashelf-data` volume (`/data/media.db`).
 | `AI_BASE_URL` | Custom endpoint, e.g. `http://localhost:11434/v1` for Ollama. Setting it alone also enables AI mode. |
 | `AI_MODEL` | Model name. Defaults to `gpt-4o-mini`. |
 | `TMDB_API_KEY` | Enables movie and TV search and local-mode discovery. |
+| `APP_PASSWORD` | When set, the whole app (pages and API) requires HTTP Basic auth. `APP_USERNAME` defaults to `admin`. |
 | `DATA_DIR` | Directory for the SQLite database. Defaults to `./data`. |
 
 If the AI endpoint fails, MediaShelf falls back to local mode and tells you why.
