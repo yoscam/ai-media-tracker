@@ -100,6 +100,7 @@ export function findDuplicate(
   title: string,
   source: string,
   externalId: string | null | undefined,
+  year?: number | null,
 ): Entry | null {
   if (externalId) {
     const row = db()
@@ -111,7 +112,13 @@ export function findDuplicate(
   const rows = db()
     .prepare("SELECT * FROM entries WHERE type = ?")
     .all(type) as Row[];
-  const hit = rows.find((r) => normalizeTitle(r.title) === key);
+  // Remakes and reboots share a title, so only treat it as a duplicate when the
+  // years are compatible or unknown, and the provider ids don't tell them apart.
+  const hit = rows.find((r) => {
+    if (normalizeTitle(r.title) !== key) return false;
+    if (externalId && r.external_id && r.source === source) return false;
+    return !year || !r.year || Math.abs(year - r.year) <= 1;
+  });
   return hit ? mapRow(hit) : null;
 }
 
