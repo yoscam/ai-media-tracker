@@ -59,7 +59,7 @@ const globalForDb = globalThis as unknown as { __mediaDb?: Database.Database };
 
 export function db(): Database.Database {
   if (globalForDb.__mediaDb) return globalForDb.__mediaDb;
-  const dir = path.resolve(process.env.DATA_DIR ?? "./data");
+  const dir = path.resolve(/*turbopackIgnore: true*/ process.env.DATA_DIR || "./data");
   fs.mkdirSync(dir, { recursive: true });
   const conn = new Database(path.join(dir, "media.db"));
   conn.pragma("journal_mode = WAL");
